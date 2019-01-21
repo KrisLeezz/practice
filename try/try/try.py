@@ -135,43 +135,79 @@ if __name__ == "__main__":
 		vis.plot_instant_freq(t)
 		vis.show()
 		plt.show()
+		return imfs,res
 	def EEMD_1(a,t):
-		eemd = EEMD()(a)
-		eimfs,res = eemd[:-1],eemd[-1]
+		eemd = EEMD(trials=200,noise_width=0.4)(a)
+		eimfs,res = eemd[:-1],eemd[-1]#这的参数有问题！！！！！！！！！！！！！！！！！！！！！
 		vis = Visualisation()
 		vis.plot_imfs(imfs=eimfs, residue=res, t=t, include_residue=True)
 		vis.plot_instant_freq(t, imfs=eimfs) # 
 		vis.show()
+		return eimfs,res
 	print "--------------------------reading data,please wait----------------------------"
 	#读取观测数据
 	all_x=[]
 	x=[]
-	csv_file_read=open('C:/Users/Mason/Documents/vs2017/new_2015_2017_1.csv')
+	csv_file_read=open('G:/EMD/test.csv')
 	csv_read=csv.reader(csv_file_read)
+	#——————————————————————————————测试——————————————————————————————————
+	#xx=[]
+	#csv_file_read2=open('G:\EMD\Matlab\FEEMD\BFVL.csv')
+	#csv_read2=csv.reader(csv_file_read2)
+	#for row in csv_read2:
+	#    xx.append(row[0])
+	#xx=np.array(xx)
+	#xx=xx.astype(float)
+	#————————————————————————————————————————————————————————————————————
 	for row in csv_read:
-	    if row[13]!='rh':
-	        x.append(row[13])	
+	    if row[0]!='rh':
+	        x.append(row[0])	
 	x=np.array(x)
 	x=x.astype(float)
 	#Y采样数据
 	y=x
 	#时间天数
 	t= np.arange(0,len(y),1)
-	
 	n=True
 	while n:
 		print 'which one? emd or eemd or dwt'
-		choice= raw_input()
+		choice='eemd'
+		#choice= raw_input()
 		print 'please wait...'
 		if choice == 'emd':
 			IMFS=EMD_1(y,t)
+			print '-------------------------finish-------------------------------'
 		elif choice =='eemd':
-			EIMFS=EEMD_1(y,t)
+			EIMFS,ERES=EEMD_1(y,t)
+			csv_file_write=open('imfs.csv','wb')
+			csv_write=csv.writer(csv_file_write)
+			csv_write.writerows(EIMFS)
+			csv_file_write.close
+			print EIMFS.shape,ERES.shape
+			print '-------------------------finish-------------------------------'
 		elif choice =='dwt':
 			plot_signal_decomp(y,'db1','PM2.5-dwt',7)
+			print '-------------------------finish-------------------------------'
 		else: print ('input error')
 		print 'Do you want to try others? Yes or No'
-		nn=raw_input()
-		if nn=='Yes':
-			n=True
-		else: n==False
+		#---------------test--------------------------------
+		n=False
+		#----------------------------------------------------
+		#nn=raw_input()
+		#if nn=='Yes':
+		#	n=True
+		#else: n=False
+
+	##significanceIMF
+	#imfs=EIMFS
+	#nDof=len(imfs)#number of data points=degree of freedom
+	#logep=[]
+	##计算每个IMF的能量谱
+	#columns=len(imfs[0])
+	#for i in range (0,colums):
+	#	logep[i][2]=0
+	#	for j in range (0,nDof):
+	#		logep[i][2]=logep[i][2]+imfs[j][i]*imfs[j][i]
+	#	logep[i][2]=logep(i,2)/nDof
+
+
